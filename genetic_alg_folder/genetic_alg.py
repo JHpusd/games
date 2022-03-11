@@ -78,6 +78,13 @@ class GeneticAlgorithm():
         if game.winner != 'Tie':
             player_pair[game.winner-1].score += 1
             player_pair[2-game.winner].score -= 1
+
+        player_pair = player_pair[::-1]
+        game = TicTacToeGene(player_pair)
+        game.run_to_completion()
+        if game.winner != 'Tie':
+            player_pair[game.winner-1].score += 1
+            player_pair[2-game.winner].score -= 1
     
     def run_all_comps(self):
         comp_pairs = list(combinations(self.all_players, 2))
