@@ -1,7 +1,7 @@
 from gene_players import *
 from tic_tac_toe import *
 import random as r
-from itertools import combinations
+from itertools import combinations, product
 import operator as op
 import math
 from functools import reduce
@@ -17,6 +17,7 @@ class GeneticAlgorithm():
         self.num_strats = num_strats
         self.top_n = num_survivors
         self.all_players = [Player() for _ in range(num_strats)]
+        self.generation = 1
         self.strat_base = self.gen_strat_base()
         self.init_set_up_players()
     
@@ -41,7 +42,9 @@ class GeneticAlgorithm():
                                         base = self.assign(base, 7, h)
                                         for i in range(3):
                                             base = self.assign(base, 8, i)
-                                            if '0' in base:
+                                            ones = base.count('1')
+                                            twos = base.count('2')
+                                            if '0' in base and abs(ones - twos) < 2:
                                                 all_states.append(base)
         return {state:None for state in all_states}
 
@@ -117,8 +120,16 @@ class GeneticAlgorithm():
                     break
                 new_player = self.mate(pair)
                 self.all_players.append(new_player)
+        self.generation += 1
     
     def make_n_gens(self, n):
         for _ in range(n):
             self.make_new_gen()
-
+    
+    def fight(self, group_1, group_2):
+        pairs = list(product(group_1, group_2))
+        for pair in pairs:
+            self.run_competition(pair)
+    
+    def copy(self, group): # scores are not copied over
+        return [player.copy() for player in group]

@@ -1,12 +1,7 @@
-class PlaceHolder():
-    def __init__(self, x):
-        self.x = x
+import math as m
 
-a = PlaceHolder(1)
-b = PlaceHolder(2)
-c = PlaceHolder(3)
-
-test = [b,a,c]
-func = lambda i: i.x
-test.sort(key=func, reverse=True)
-print([item.x for item in test])
+board = [[1, 2, 0], [0, 1, 2], [0, 0, 0]]
+state = '120012000'
+choice = 3
+print(int(m.floor(choice/3)))
+print(int(choice % 3))

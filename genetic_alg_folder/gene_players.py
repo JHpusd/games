@@ -17,3 +17,9 @@ class Player():
     
     def move(self, game_state):
         return self.strategy[game_state]
+    
+    def copy(self):
+        player_copy = Player(player_name=self.player_name)
+        player_copy.set_num(self.player_num)
+        player_copy.set_strat(self.strategy)
+        return player_copy
