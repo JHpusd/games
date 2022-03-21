@@ -108,7 +108,7 @@ class TicTacToeGene():
                 if val == 3-player_num:
                     board_state += '2'
         return board_state
-    
+
     def complete_turn(self):
         if self.winner != None:
             return
