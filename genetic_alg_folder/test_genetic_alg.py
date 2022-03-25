@@ -5,7 +5,39 @@ from itertools import combinations, product
 import random as r
 import matplotlib.pyplot as plt
 
+gen_alg = GeneticAlgorithm(25)
+gens = [1,2,3,5,10,15,20,30,50,75,100,150]
 
+plot_1 = []
+plot_2 = []
+
+def win_cap_freq(player_group)
+plot_3 = []
+plot_4 = []
+
+gen_1 = gen_alg.copy(gen_alg.all_players)
+#prev_gen = gen_alg.copy(gen_alg.all_players)
+for gen in gens:
+    while gen_alg.generation != gen:
+        #prev_gen = gen_alg.copy(gen_alg.all_players)
+        gen_alg.make_new_gen('rr', 'cut', 0)
+    gen_alg.all_players.sort(key=lambda x: x.score, reverse=True)
+    gen_n = gen_alg.copy(gen_alg.all_players[:5])
+    gen_n_2 = gen_alg.copy(gen_alg.all_players)
+
+    gen_alg.fight(gen_1, gen_n)
+    #plot_1.append(sum([p.score for p in gen_n])/5)
+'''
+plt.style.use('bmh')
+plt.figure(0)
+plt.plot(gens, plot_1)
+plt.xlabel('# generations')
+plt.ylabel('avg score against 1st gen')
+plt.savefig('plot_1.png')
+'''
+plt.figure(1)
+plt.plot(gens, plot_2)
+plt.savefig('plot_2.png')
 
 '''
 gen_alg = GeneticAlgorithm(25, 5)

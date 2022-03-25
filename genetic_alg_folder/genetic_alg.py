@@ -99,7 +99,7 @@ class GeneticAlgorithm():
             self.run_competition(pair)
         players.sort(key=lambda x: x.score, reverse=True)
     
-    def random_pairs(self, players):
+    def comp_pairs(self, players):
         if len(players) < 2:
             return []
         pairs = []
@@ -113,7 +113,7 @@ class GeneticAlgorithm():
         return pairs
 
     def bracket_comps(self, players):
-        comps = self.random_pairs(players)
+        comps = self.comp_pairs(players)
         winners = [] # winners continue
         while len(comps) >= 1:
             for pair in comps:
@@ -127,11 +127,12 @@ class GeneticAlgorithm():
                 else:
                     i = r.choice([0,1])
                     winners.append(pair[i])
-            comps = self.random_pairs(winners)
+            comps = self.comp_pairs(winners)
             winners = []
         players.sort(key=lambda x: x.score, reverse=True)
     
-    def hard_cut(self, players, top_n=self.top_n):
+    def hard_cut(self, players):
+        top_n = int(len(players)/4)
         players.sort(key=lambda x: x.score, reverse=True)
         return players[:top_n]
     
@@ -144,8 +145,9 @@ class GeneticAlgorithm():
             set_copy.remove(item)
         return result
     
-    def stochastic(self, players, top_n=self.top_n):
+    def stochastic(self, players):
         players_copy = list(players)
+        top_n = int(len(players_copy)/4)
         result = []
         for _ in range(top_n):
             r_subset = self.subset(players_copy, len(players)/8)
@@ -155,9 +157,10 @@ class GeneticAlgorithm():
             players_copy.remove(r_subset[i])
         return result
     
-    def tournament(self, rr_or_b, players, top_n=self.top_n): # scoring and selection
+    def tournament(self, rr_or_b, players): # scoring and selection
         # rr is round robin, b is bracket
         players_copy = list(players)
+        top_n = int(len(players_copy)/4)
         result = []
         for _ in range(top_n):
             r_subset = self.subset(players_copy, len(players)/8)
@@ -173,34 +176,35 @@ class GeneticAlgorithm():
     def mate(self, player_pair, mutat_rate):
         new_player = Player()
         new_strat = {}
-        strat_1 = player_pair[0].strategy
-        strat_2 = player_pair[1].strategy
+        strat_1 = dict(player_pair[0].strategy)
+        strat_2 = dict(player_pair[1].strategy)
         for key in strat_1:
             i = r.choice(self.valid_indices(key))
             options = [strat_1[key], strat_2[key], i]
-            new_strat[key] = r.choices(options, weights=((1-mutat_rate)/2, (1-mutat_rate)/2, mutat_rate))
+            new_strat[key] = r.choices(options, weights=((1-mutat_rate)/2, (1-mutat_rate)/2, mutat_rate))[0]
         new_player.set_strat(new_strat)
         return new_player
-
-    '''
-    def strat_selection(self):
-        self.run_all_comps()
-        func = lambda player: player.score
-        self.all_players.sort(key=func, reverse=True)
-        self.all_players = self.all_players[:self.top_n]    
     
-    def make_new_gen(self):
-        self.strat_selection()
-        mate_pairs = list(combinations(self.all_players, 2))
-        while len(self.all_players) != self.num_strats:
-            for pair in mate_pairs:
-                if len(self.all_players) == self.num_strats:
-                    break
-                new_player = self.mate(pair)
-                self.all_players.append(new_player)
+    def make_new_gen(self, comp_method, select_method, mutat_rate):
+        # rr or b for comp_method
+        # cut, stoch, or tourney for select_method
+        if select_method == 'tourney':
+            self.all_players = self.tournament(comp_method, self.all_players)
+        else:
+            if comp_method == 'rr':
+                self.round_robin(self.all_players)
+            elif comp_method == 'b':
+                self.bracket_comps(self.all_players)
+            if select_method == 'cut':
+                self.all_players = self.hard_cut(self.all_players)
+            elif select_method == 'stoch':
+                self.all_players = self.stochastic(self.all_players)
+        
+        while len(self.all_players) < self.num_strats:
+            new_player = self.mate(r.sample(self.all_players, 2), mutat_rate)
+            self.all_players.append(new_player)
         self.generation += 1
     
-    def make_n_gens(self, n):
+    def make_n_gens(self, n, comp_method, select_method, mutat_rate):
         for _ in range(n):
-            self.make_new_gen()
-    '''
+            self.make_new_gen(comp_method, select_method, mutat_rate)

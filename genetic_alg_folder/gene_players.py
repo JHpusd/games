@@ -21,5 +21,5 @@ class Player():
     def copy(self):
         player_copy = Player(player_name=self.player_name)
         player_copy.set_num(self.player_num)
-        player_copy.set_strat(self.strategy)
+        player_copy.set_strat({key:self.strategy[key] for key in self.strategy})
         return player_copy
