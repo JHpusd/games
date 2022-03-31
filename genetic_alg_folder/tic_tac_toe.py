@@ -108,6 +108,15 @@ class TicTacToeGene():
                 if val == 3-player_num:
                     board_state += '2'
         return board_state
+    
+    def state_to_board(self, board_state):
+        board = []
+        for i in [0, 3, 6]:
+            board.append([int(board_state[n]) for n in [i, i+1, i+2]])
+        return board
+    
+    def win_cap(self, player, board, choice):
+        pass
 
     def complete_turn(self):
         if self.winner != None:
