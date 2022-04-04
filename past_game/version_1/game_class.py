@@ -2,7 +2,7 @@
 class TicTacToe():
     def __init__(self, players):
         self.players = players
-        self.board = [[None, None, None], [None, None, None], [None, None, None]]
+        self.board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         self.set_player_nums()
         self.turn = 0
         self.winner = None
@@ -31,7 +31,7 @@ class TicTacToe():
     def valid_only(self, nested_list):
         result = list(nested_list)
         for row in result:
-            if row.count(None) == len(row):
+            if row.count(0) == len(row):
                 result.remove(row)
         return result
     
@@ -46,7 +46,7 @@ class TicTacToe():
         valid_coords = []
         for i in range(len(self.board)):
             for j in range(len(self.board[0])):
-                if self.board[i][j] == None:
+                if self.board[i][j] == 0:
                     valid_coords.append((i,j))
         return valid_coords
     
@@ -65,7 +65,7 @@ class TicTacToe():
                 return 1
             if self.all_what_elem(item) == 2:
                 return 2
-        if None not in self.flatten(rcd):
+        if 0 not in self.flatten(rcd):
             return 'Tie'
         return None
     
@@ -79,12 +79,12 @@ class TicTacToe():
     
     def complete_turn(self):
         for player in self.players:
-            player_num = player.player_num
+            player_num = self.players.index(player) + 1
             options = self.get_coord_options()
             choice = player.choose_coord(options)
             self.board[choice[0]][choice[1]] = player_num
-            if self.check_for_winner() != None:
-                self.winner = self.check_for_winner()
+            self.winner = self.check_for_winner()
+            if self.winner != None:
                 break
         self.turn += 1
     

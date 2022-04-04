@@ -6,10 +6,6 @@ class Player():
         self.player_num = None
         self.strategy = None
         self.score = 0
-        self.win_caps = 0
-        self.win_chances = 0
-        self.loss_stops = 0
-        self.loss_chances = 0
 
     def set_num(self, num):
         self.player_num = num

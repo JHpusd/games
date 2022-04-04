@@ -1,5 +1,5 @@
 import sys
-sys.path.append('tic_tac_toe')
+sys.path.append('past_game')
 from game_tree import *
 from random import random
 import math
@@ -11,7 +11,7 @@ class RandomPlayer():
     def set_num(self, num):
         self.player_num = num
     
-    def choose_coord(self, game_state):
+    def choose_coord(self, options):
         random_idx = math.floor(len(options) * random())
         return options[random_idx]
 

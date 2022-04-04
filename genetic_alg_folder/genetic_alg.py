@@ -208,3 +208,73 @@ class GeneticAlgorithm():
     def make_n_gens(self, n, comp_method, select_method, mutat_rate):
         for _ in range(n):
             self.make_new_gen(comp_method, select_method, mutat_rate)
+    
+    def winnable(self, state):
+        game = TicTacToeGene([1,2], override_init=True)
+        board = game.state_to_board(state)
+        rcd = game.get_rows_cols_diags(board)
+        for item in rcd:
+            if item.count(1) == 2 and 2 not in item:
+                return True
+        return False
+    
+    def losable(self, state):
+        game = TicTacToeGene([1,2], override_init=True)
+        board = game.state_to_board(state)
+        rcd = game.get_rows_cols_diags(board)
+        for item in rcd:
+            if item.count(2) == 2 and 1 not in item:
+                return True
+        return False
+    
+    def insert(self, string, idx, item):
+        return string[:idx] + item + string[idx+1:]
+    
+    def win_captured(self, state, choice):
+        new_state = self.insert(state, choice, '1')
+        game = TicTacToeGene([1,2], override_init=True)
+        new_board = game.state_to_board(new_state)
+        if game.check_for_winner(new_board) == 1:
+            return True
+        return False
+    
+    def loss_prevented(self, state, choice):
+        game = TicTacToeGene([1,2], override_init=True)
+        board = game.state_to_board(state)
+        row = int(m.floor(choice/3))
+        col = int(choice % 3)
+        coord_rcd = game.rcd_of_coord(board, (row,col))
+        for item in coord_rcd:
+            if item.count(2) == 2:
+                return True
+        return False
+
+    def win_cap_loss_prev_freq(self, player):
+        strat = player.strategy
+        win_caps = 0
+        win_chances = 0
+        loss_prevs = 0
+        loss_chances = 0
+
+        for state in strat:
+            choice = strat[state]
+            won = False
+            if self.winnable(state):
+                win_chances += 1
+                if self.win_captured(state, choice):
+                    win_caps += 1
+                    won = True
+            if self.losable(state) and not won:
+                loss_chances += 1
+                if self.loss_prevented(state, choice):
+                    loss_prevs += 1
+        
+        return {'win_cap':win_caps/win_chances, 'loss_prev':loss_prevs/loss_chances}
+    
+    def wc_lp_for_all(self, player_group):
+        result = {'win_cap': 0, 'loss_prev': 0}
+        for player in player_group:
+            wc_lp = self.win_cap_loss_prev_freq(player)
+            for key in wc_lp:
+                result[key] += wc_lp[key]/len(player_group)
+        return result

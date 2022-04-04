@@ -1,5 +1,5 @@
 import sys
-sys.path.append('tic_tac_toe/version_1')
+sys.path.append('past_game/version_1')
 from game_class import *
 from player_class import *
 
