@@ -7,12 +7,12 @@ import matplotlib.pyplot as plt
 
 gen_alg = GeneticAlgorithm(25)
 gens = [1,2,3,5,10,15,20,30,50,75,100,150]
-
-#plot_1 = []
-#plot_2 = []
+'''
+plot_1 = []
+plot_2 = []
 plot_3 = []
 plot_4 = []
-'''
+
 gen_1 = gen_alg.copy(gen_alg.all_players)
 prev_gen = gen_alg.copy(gen_alg.all_players)
 for gen in gens:
@@ -21,7 +21,7 @@ for gen in gens:
         gen_alg.make_new_gen('rr', 'cut', 0)
     all_players = gen_alg.copy(gen_alg.all_players)
     gen_alg.round_robin(all_players)
-    gen_n = gen_alg.copy(gen_alg.all_players[:5])
+    gen_n = gen_alg.copy(all_players[:5])
     gen_n_2 = gen_alg.copy(gen_n)
 
     gen_alg.fight(gen_1, gen_n)
@@ -36,12 +36,14 @@ plt.plot(gens, plot_2, label='vs prev gen')
 plt.xlabel('# generations')
 plt.legend(loc='best')
 plt.savefig('plots_1_and_2.png')
-'''
+
 
 for gen in gens:
     while gen_alg.generation != gen:
         gen_alg.make_new_gen('rr', 'cut', 0)
-    wc_lp = gen_alg.wc_lp_for_all(gen_alg.all_players)
+    all_players = gen_alg.copy(gen_alg.all_players)
+    gen_alg.round_robin(all_players)
+    wc_lp = gen_alg.wc_lp_for_all(all_players[:5])
     plot_3.append(wc_lp['win_cap'])
     plot_4.append(wc_lp['loss_prev'])
 
@@ -52,7 +54,6 @@ plt.xlabel('# generations')
 plt.legend(loc='best')
 plt.savefig('plots_3_and_4.png')
 
-'''
 gen_alg = GeneticAlgorithm(25, 5)
 gen_1 = list(gen_alg.all_players)
 gen_alg.make_n_gens(20)
@@ -88,3 +89,4 @@ print(scores)
 # gen 21 vs gen 41: 38 - 47 and 39 - 57 and 20 - 78
 # gen 1 vs gen 71: 39 - 51
 '''
+

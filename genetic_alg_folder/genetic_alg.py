@@ -268,7 +268,7 @@ class GeneticAlgorithm():
                 loss_chances += 1
                 if self.loss_prevented(state, choice):
                     loss_prevs += 1
-        
+
         return {'win_cap':win_caps/win_chances, 'loss_prev':loss_prevs/loss_chances}
     
     def wc_lp_for_all(self, player_group):
