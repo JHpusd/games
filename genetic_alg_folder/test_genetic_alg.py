@@ -5,8 +5,52 @@ from itertools import combinations, product
 import random as r
 import matplotlib.pyplot as plt
 
-gen_alg = GeneticAlgorithm(25)
-gens = [1,2,3,5,10,15,20,30,50,75,100,150]
+gens = list(range(2,26))
+pop_size = 32
+fitness = 'rr' # rr or b (bracket)
+selection = 'cut' # cut or stoch or tourney
+mut_rate = 0.001
+
+vs_gen_1 = []
+vs_prev_gen = []
+
+gen_alg = GeneticAlgorithm(pop_size)
+gen_1 = gen_alg.copy(gen_alg.all_players)
+prev_gen = gen_alg.copy(gen_alg.all_players)
+
+for gen in gens:
+    while gen_alg.generation != gen:
+        prev_gen = gen_alg.copy(gen_alg.all_players)
+        gen_alg.make_new_gen(fitness, selection, mut_rate)
+    new_gen = gen_alg.all_players
+    vs_gen_1_wins = 0
+    vs_prev_gen_wins = 0
+
+    for _ in range(50):
+        matchup_1 = [r.choice(new_gen), r.choice(gen_1)]
+        matchup_2 = [r.choice(new_gen), r.choice(prev_gen)]
+        r.shuffle(matchup_1)
+        r.shuffle(matchup_2)
+
+        game_1 = TicTacToeGene(matchup_1)
+        game_2 = TicTacToeGene(matchup_2)
+        game_1.run_to_completion()
+        game_2.run_to_completion()
+        if game_1.winner != 'Tie' and game_1.players[game_1.winner-1].gen == gen:
+            vs_gen_1_wins += 1
+        if game_2.winner != 'Tie' and game_2.players[game_2.winner-1].gen == gen:
+            vs_prev_gen_wins += 1
+    
+    vs_gen_1.append(vs_gen_1_wins/50)
+    vs_prev_gen.append(vs_prev_gen_wins/50)
+
+plt.style.use('bmh')
+plt.plot(gens, vs_gen_1, label='vs 1st gen')
+plt.plot(gens, vs_prev_gen, label='vs prev gen')
+plt.xlabel('# generations')
+plt.legend(loc='best')
+plt.savefig('test.png')
+
 '''
 plot_1 = []
 plot_2 = []

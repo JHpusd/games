@@ -6,6 +6,7 @@ class Player():
         self.player_num = None
         self.strategy = None
         self.score = 0
+        self.gen = 1
 
     def set_num(self, num):
         self.player_num = num
@@ -22,4 +23,5 @@ class Player():
         player_copy = Player(player_name=self.player_name)
         player_copy.set_num(self.player_num)
         player_copy.set_strat({key:self.strategy[key] for key in self.strategy})
+        player_copy.gen = int(self.gen)
         return player_copy

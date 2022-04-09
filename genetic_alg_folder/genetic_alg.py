@@ -12,6 +12,7 @@ class GeneticAlgorithm():
     def __init__(self, num_strats):
         self.num_strats = num_strats
         self.top_n = num_strats/4 # should always be an int
+        assert self.top_n == int(self.top_n), "num_strats is not a power of 2 (or less than 4)"
         self.all_players = [Player() for _ in range(num_strats)]
         self.generation = 1
         self.strat_base = self.gen_strat_base()
@@ -203,7 +204,10 @@ class GeneticAlgorithm():
         while len(self.all_players) < self.num_strats:
             new_player = self.mate(r.sample(self.all_players, 2), mutat_rate)
             self.all_players.append(new_player)
+
         self.generation += 1
+        for player in self.all_players:
+            player.gen = self.generation
     
     def make_n_gens(self, n, comp_method, select_method, mutat_rate):
         for _ in range(n):
