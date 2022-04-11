@@ -123,7 +123,7 @@ class GeneticAlgorithm():
                 self.run_competition(pair)
                 if p1.score > p2.score:
                     winners.append(p1)
-                if p2.score > p1.score:
+                elif p2.score > p1.score:
                     winners.append(p2)
                 else:
                     i = r.choice([0,1])
@@ -151,7 +151,7 @@ class GeneticAlgorithm():
         top_n = int(len(players_copy)/4)
         result = []
         for _ in range(top_n):
-            r_subset = self.subset(players_copy, len(players)/8)
+            r_subset = self.subset(players_copy, int(len(players)/8))
             scores = [player.score for player in r_subset]
             i = scores.index(max(scores))
             result.append(r_subset[i])
@@ -164,11 +164,11 @@ class GeneticAlgorithm():
         top_n = int(len(players_copy)/4)
         result = []
         for _ in range(top_n):
-            r_subset = self.subset(players_copy, len(players)/8)
+            r_subset = self.subset(players_copy, int(len(players)/8))
             if rr_or_b == 'rr':
                 self.round_robin(r_subset)
             elif rr_or_b == 'b':
-                self.bracket_comp(r_subset)
+                self.bracket_comps(r_subset)
             else:
                 print('bruh moment')
             result.append(r_subset[0])
