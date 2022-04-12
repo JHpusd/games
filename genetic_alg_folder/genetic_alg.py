@@ -135,7 +135,7 @@ class GeneticAlgorithm():
     def hard_cut(self, players):
         top_n = int(len(players)/4)
         players.sort(key=lambda x: x.score, reverse=True)
-        return players[:top_n]
+        return [player.copy() for player in players[:top_n]]
     
     def subset(self, input_set, num):
         set_copy = list(input_set)
@@ -156,7 +156,7 @@ class GeneticAlgorithm():
             i = scores.index(max(scores))
             result.append(r_subset[i])
             players_copy.remove(r_subset[i])
-        return result
+        return [player.copy() for player in result]
     
     def tournament(self, rr_or_b, players): # scoring and selection
         # rr is round robin, b is bracket
@@ -170,9 +170,25 @@ class GeneticAlgorithm():
             elif rr_or_b == 'b':
                 self.bracket_comps(r_subset)
             else:
-                print('bruh moment')
+                print('bruh moment (genetic alg tournament)')
             result.append(r_subset[0])
-        return result
+            players_copy.remove(r_subset[0])
+        return [player.copy() for player in result]
+    
+    def top_players(self, players, fitness, selection):
+        players_copy = self.copy(players)
+        if selection == 'tourney':
+            players_copy = self.tournament(fitness, players_copy)
+        else:
+            if fitness == 'rr':
+                self.round_robin(players_copy)
+            elif fitness == 'b':
+                self.bracket_comps(players_copy)
+            if selection == 'cut':
+                players_copy = self.hard_cut(players_copy)
+            elif selection == 'stoch':
+                players_copy = self.stochastic(players_copy)
+        return players_copy
     
     def mate(self, player_pair, mutat_rate):
         new_player = Player()

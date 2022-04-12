@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 gens = list(range(2,26))
 pop_size = 32
 fitness = 'b' # rr or b (bracket)
-selection = 'tourney' # cut or stoch or tourney
+selection = 'cut' # cut or stoch or tourney
 mut_rate = 0.001
 
 vs_gen_1 = []
@@ -22,7 +22,7 @@ for gen in gens:
     while gen_alg.generation != gen:
         prev_gen = gen_alg.copy(gen_alg.all_players)
         gen_alg.make_new_gen(fitness, selection, mut_rate)
-    new_gen = gen_alg.all_players
+    new_gen = gen_alg.top_players(gen_alg.all_players, fitness, selection)
     vs_gen_1_wins = 0
     vs_prev_gen_wins = 0
     print(new_gen[0].gen)
@@ -38,14 +38,15 @@ for gen in gens:
         game_1.run_to_completion()
         game_2.run_to_completion()
         
-        if game_1.winner != 'Tie' and game_1.players[game_1.winner-1].gen == gen:
-            vs_gen_1_wins += 1
-        if game_2.winner != 'Tie' and game_2.players[game_2.winner-1].gen == gen:
-            vs_prev_gen_wins += 1
-    print(f'vs gen 1: {vs_gen_1_wins}')
-    print(f'vs prev gen: {vs_prev_gen_wins}')
-    vs_gen_1.append(vs_gen_1_wins/50)
-    vs_prev_gen.append(vs_prev_gen_wins/50)
+        if game_1.winner != 'Tie':
+            if game_1.players[game_1.winner-1].gen == gen:
+                vs_gen_1_wins += 1
+        if game_2.winner != 'Tie':
+            if game_2.players[game_2.winner-1].gen == gen:
+                vs_prev_gen_wins += 1
+
+    vs_gen_1.append(vs_gen_1_wins)
+    vs_prev_gen.append(vs_prev_gen_wins)
 
 plt.style.use('bmh')
 plt.plot(gens, vs_gen_1, label='vs 1st gen')
