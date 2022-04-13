@@ -4,11 +4,11 @@ from genetic_alg import *
 from itertools import combinations, product
 import random as r
 import matplotlib.pyplot as plt
-
-gens = list(range(2,26))
+'''
+gens = list(range(2,41))
 pop_size = 32
-fitness = 'b' # rr or b (bracket)
-selection = 'cut' # cut or stoch or tourney
+fitness = 'rr' # rr or b (bracket)
+selection = 'tourney' # cut or stoch or tourney
 mut_rate = 0.001
 
 vs_gen_1 = []
@@ -23,13 +23,13 @@ for gen in gens:
         prev_gen = gen_alg.copy(gen_alg.all_players)
         gen_alg.make_new_gen(fitness, selection, mut_rate)
     new_gen = gen_alg.top_players(gen_alg.all_players, fitness, selection)
+    new_gen_2 = gen_alg.copy(new_gen)
     vs_gen_1_wins = 0
     vs_prev_gen_wins = 0
-    print(new_gen[0].gen)
 
-    for _ in range(50):
+    for _ in range(100):
         matchup_1 = [r.choice(new_gen), r.choice(gen_1)]
-        matchup_2 = [r.choice(new_gen), r.choice(prev_gen)]
+        matchup_2 = [r.choice(new_gen_2), r.choice(prev_gen)]
         r.shuffle(matchup_1)
         r.shuffle(matchup_2)
 
@@ -45,8 +45,8 @@ for gen in gens:
             if game_2.players[game_2.winner-1].gen == gen:
                 vs_prev_gen_wins += 1
 
-    vs_gen_1.append(vs_gen_1_wins)
-    vs_prev_gen.append(vs_prev_gen_wins)
+    vs_gen_1.append(vs_gen_1_wins/100)
+    vs_prev_gen.append(vs_prev_gen_wins/100)
 
 plt.style.use('bmh')
 plt.plot(gens, vs_gen_1, label='vs 1st gen')
@@ -54,8 +54,17 @@ plt.plot(gens, vs_prev_gen, label='vs prev gen')
 plt.xlabel('# generations')
 plt.legend(loc='best')
 plt.savefig('test.png')
-
 '''
+
+pop_size = 32
+fitness = 'rr'
+selection = 'cut'
+mut_rate = 0
+gens = [1,2,3,5,10,15,20,25,50,75,100,125,150]
+
+gen_alg = GeneticAlgorithm(pop_size)
+
+
 plot_1 = []
 plot_2 = []
 plot_3 = []
@@ -64,6 +73,7 @@ plot_4 = []
 gen_1 = gen_alg.copy(gen_alg.all_players)
 prev_gen = gen_alg.copy(gen_alg.all_players)
 for gen in gens:
+    print(gen)
     while gen_alg.generation != gen:
         prev_gen = gen_alg.copy(gen_alg.all_players)
         gen_alg.make_new_gen('rr', 'cut', 0)
@@ -85,7 +95,7 @@ plt.xlabel('# generations')
 plt.legend(loc='best')
 plt.savefig('plots_1_and_2.png')
 
-
+'''
 for gen in gens:
     while gen_alg.generation != gen:
         gen_alg.make_new_gen('rr', 'cut', 0)
