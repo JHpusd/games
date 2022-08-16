@@ -4,11 +4,11 @@ from genetic_alg import *
 from itertools import combinations, product
 import random as r
 import matplotlib.pyplot as plt
-'''
-gens = list(range(2,41))
+
+gens = [1,2,3,5,10,15,20,25,50]
 pop_size = 32
 fitness = 'rr' # rr or b (bracket)
-selection = 'tourney' # cut or stoch or tourney
+selection = 'cut' # cut or stoch or tourney
 mut_rate = 0.001
 
 vs_gen_1 = []
@@ -26,7 +26,8 @@ for gen in gens:
     new_gen_2 = gen_alg.copy(new_gen)
     vs_gen_1_wins = 0
     vs_prev_gen_wins = 0
-
+    print(new_gen[0].gen)
+    # change to every strat from new gen plays all old strats
     for _ in range(100):
         matchup_1 = [r.choice(new_gen), r.choice(gen_1)]
         matchup_2 = [r.choice(new_gen_2), r.choice(prev_gen)]
@@ -60,7 +61,7 @@ pop_size = 32
 fitness = 'rr'
 selection = 'cut'
 mut_rate = 0
-gens = [1,2,3,5,10,15,20,25,50,75,100,125,150]
+gens = [2,3,5,10,15,20,25,50]
 
 gen_alg = GeneticAlgorithm(pop_size)
 
@@ -95,7 +96,7 @@ plt.xlabel('# generations')
 plt.legend(loc='best')
 plt.savefig('plots_1_and_2.png')
 
-'''
+
 for gen in gens:
     while gen_alg.generation != gen:
         gen_alg.make_new_gen('rr', 'cut', 0)
