@@ -12,7 +12,7 @@ class MinimaxPlayer():
     
     def set_player_number(self, player_num):
         self.number = player_num
-        self.game = GameTree([[None for _ in range(3)] for _ in range(3)], self.number)
+        self.game = ReducedGameTree([[None for _ in range(3)] for _ in range(3)], self.number)
         self.game.create_game_tree()
         self.game.set_node_scores()
     

@@ -1,14 +1,18 @@
 from random import random
+from logger import *
 
 class TicTacToe:
-  def __init__(self, players):
+  def __init__(self, players, log_name='logs.txt'):
     self.players = players
+    self.logs = Logger('/workspace/games/game_tree_logs/'+log_name)
+    self.logs.clear_log()
     # self.set_player_symbols()
     self.set_player_numbers()
     # self.determine_player_order()
     self.board = [[None for _ in range(3)] for _ in range(3)]
     self.round =  1
     self.winner = None
+    self.log_board()
   '''
   def set_player_symbols(self): 
     self.players[0].set_player_symbol('X')
@@ -36,10 +40,15 @@ class TicTacToe:
         self.winner = self.check_for_winner()
         break
     self.round += 1
+    self.log_board()
 
   def run_to_completion(self):
     while self.winner == None:
       self.complete_round()
+    if self.winner != 'Tie':
+      self.logs.write(f'PLAYER {self.winner} WINS')
+    else:
+      self.logs.write('TIE')
 
   def check_for_winner(self):
     rows = self.board.copy()
@@ -60,7 +69,7 @@ class TicTacToe:
       return 'Tie'
     return None
 
-  def print_board(self):
+  def log_board(self):
     for i in range(len(self.board)):
       row = self.board[i]
       row_string = ''
@@ -69,8 +78,8 @@ class TicTacToe:
           row_string += '_|'
         else:
           row_string += str(space) + '|'
-      print(row_string[:-1])
-    print('\n')
+      self.logs.write(row_string[:-1]+'\n')
+    self.logs.write('\n')
 
   def update_player_boards(self):
     for player in self.players:

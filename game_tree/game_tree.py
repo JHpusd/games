@@ -30,14 +30,14 @@ class GameNode():
         return None
     
     def children_to_score(self):
-        if self.children == None:
+        if self.children == None or len(self.children) == 0:
             return None
         for child in self.children:
             child.set_score()
         return [child.score for child in self.children]
     
     def set_score(self):
-        if self.children == None:
+        if self.children == None or len(self.children) == 0:
             if self.winner == self.player:
                 self.score = 1
             elif self.winner == 3 - self.player:
@@ -162,6 +162,7 @@ def flatten(input_list):
     for collection in input_list:
         result += collection
     return result
+
 '''
 root_state = [[None for _ in range(3)] for _ in range(3)]
 
