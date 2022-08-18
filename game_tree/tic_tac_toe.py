@@ -80,6 +80,18 @@ class TicTacToe:
           row_string += str(space) + '|'
       self.logs.write(row_string[:-1]+'\n')
     self.logs.write('\n')
+  
+  def print_board(self):
+    for i in range(len(self.board)):
+      row = self.board[i]
+      row_string = ''
+      for space in row:
+        if space == None:
+          row_string += '_|'
+        else:
+          row_string += str(space) + '|'
+      print(row_string[:-1])
+    print('\n')
 
   def update_player_boards(self):
     for player in self.players:

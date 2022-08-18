@@ -22,5 +22,4 @@ for gen in gens:
     vs_gen_1_score.append(sum([p.score for p in new_gen]))
 print(vs_gen_1_score)
 '''
-test = [1,None,0]
-print(max(test))
+print(int(' '))
