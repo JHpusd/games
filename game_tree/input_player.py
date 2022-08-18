@@ -16,6 +16,7 @@ class InputPlayer:
       pass
 
   def print_board(self, board):
+    print('\n')
     for i in range(len(board)):
       row = board[i]
       row_string = ''
@@ -25,9 +26,9 @@ class InputPlayer:
         else:
           row_string += str(space) + '|'
       print(row_string[:-1])
-    print('\n')
   
   def choose_move(self, game_state):
+    print('\n')
     choices = [(i,j) for i in range(len(game_state)) for j in range(len(game_state)) if game_state[i][j]==None]
     self.print_board(game_state)
     print(f'Your turn, you are player {self.number}')
@@ -41,4 +42,22 @@ class InputPlayer:
             row_col.append(int(elem))
         except:
             continue
-    if len(row_col) != 2
+    if len(row_col) != 2:
+      print('There was an error')
+      self.choose_move(game_state)
+    row_col = tuple([i-1 for i in row_col])
+
+    if row_col not in choices:
+      print('Invalid choice')
+      self.choose_move(game_state)
+    
+    return row_col
+  
+  def report_winner(self, winner_num, board):
+    self.print_board(board)
+    if winner_num == self.number:
+      print('You won')
+    elif winner_num == 3-self.number:
+      print('You lost')
+    else:
+      print('Tie')

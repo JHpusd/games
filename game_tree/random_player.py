@@ -19,3 +19,6 @@ class RandomPlayer:
     choices = [(i,j) for i in range(len(game_state)) for j in range(len(game_state)) if game_state[i][j]==None]
     random_idx = math.floor(len(choices) * random())
     return choices[random_idx]
+  
+  def report_winner(self, winner_num,board):
+    pass

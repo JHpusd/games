@@ -24,3 +24,6 @@ class MinimaxPlayer():
     
     def choose_move(self, game_state):
         return self.game.get_best_move()
+    
+    def report_winner(self, winner_num,board):
+        pass

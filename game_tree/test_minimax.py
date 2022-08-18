@@ -2,6 +2,7 @@ from game_tree import *
 from minimax_player import *
 from random_player import *
 from top_left_player import *
+from input_player import *
 from tic_tac_toe import *
 '''
 wins = {'minimax':0, 'random':0, 'tie':0}
@@ -30,3 +31,6 @@ for _ in range(50):
     elif game.winner == 1:
         wins['random'] += 1
 '''
+players = [InputPlayer(), MinimaxPlayer()]
+game = TicTacToe(players)
+game.run_to_completion()

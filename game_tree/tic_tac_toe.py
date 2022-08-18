@@ -38,6 +38,8 @@ class TicTacToe:
       self.update_player_boards()
       if self.check_for_winner() != None:
         self.winner = self.check_for_winner()
+        for player in self.players:
+          player.report_winner(self.winner, self.board)
         break
     self.round += 1
     self.log_board()

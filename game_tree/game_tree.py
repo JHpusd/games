@@ -135,7 +135,7 @@ class ReducedGameTree():
 
     def create_game_tree(self):
         if len(self.current_nodes) == 0:
-            self.current_nodes = [self.root]w
+            self.current_nodes = [self.root]
             return
         all_children = []
         for node in self.current_nodes:

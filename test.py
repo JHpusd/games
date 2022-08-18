@@ -22,4 +22,12 @@ for gen in gens:
     vs_gen_1_score.append(sum([p.score for p in new_gen]))
 print(vs_gen_1_score)
 '''
-print(int(' '))
+test = 'hi my name is 1'
+test_ints = []
+for elem in test:
+    try:
+        test_ints.append(int(elem))
+    except:
+        continue
+
+print(test_ints)

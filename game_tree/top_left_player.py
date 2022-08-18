@@ -24,3 +24,6 @@ class TopLeftPlayer:
             top_left = choice
             min_val = choice[0] + choice[1]
     return top_left
+  
+  def report_winner(self, winner_num,board):
+    pass
