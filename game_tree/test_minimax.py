@@ -32,5 +32,5 @@ for _ in range(50):
         wins['random'] += 1
 '''
 players = [InputPlayer(), MinimaxPlayer()]
-game = TicTacToe(players)
+game = TicTacToe(players, 'minimax_v_input.txt')
 game.run_to_completion()

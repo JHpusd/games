@@ -28,7 +28,6 @@ class InputPlayer:
       print(row_string[:-1])
   
   def choose_move(self, game_state):
-    print('\n')
     choices = [(i,j) for i in range(len(game_state)) for j in range(len(game_state)) if game_state[i][j]==None]
     self.print_board(game_state)
     print(f'Your turn, you are player {self.number}')
@@ -44,7 +43,7 @@ class InputPlayer:
             continue
     if len(row_col) != 2:
       print('There was an error')
-      self.choose_move(game_state)
+      return self.choose_move(game_state)
     row_col = tuple([i-1 for i in row_col])
 
     if row_col not in choices:
