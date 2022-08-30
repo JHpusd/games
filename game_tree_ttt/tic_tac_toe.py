@@ -1,8 +1,10 @@
+import sys
 from random import random
+sys.path.append('game_tree_logs')
 from logger import *
 
 class TicTacToe:
-  def __init__(self, players, log_name='logs.txt'):
+  def __init__(self, players, log_name='ttt_logs.txt'):
     self.players = players
     self.logs = Logger('/workspace/games/game_tree_logs/'+log_name)
     self.logs.clear_log()

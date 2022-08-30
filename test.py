@@ -1,33 +1,27 @@
-import sys
-sys.path.append('genetic_alg_folder')
-from genetic_alg import *
-from tic_tac_toe import *
-import random as r
-'''
-gen_alg = GeneticAlgorithm(32)
-gen_1 = gen_alg.copy(gen_alg.all_players)
-prev_gen = gen_alg.copy(gen_1)
-gens = [2,3,4,5,10,15,20]
-vs_gen_1_score = []
+def transpose(col_board):
+    board = []
+    for i in range(6):
+        row = []
+        for col in col_board:
+            row.append(col[i])
+        board.append(row)
+    return board
 
-for gen in gens:
-    while gen_alg.generation != gen:
-        prev_gen = gen_alg.copy(gen_alg.all_players)
-        gen_alg.make_new_gen('rr', 'cut', 0)
-    new_gen = gen_alg.copy(gen_alg.all_players)
-    gen_alg.round_robin(new_gen)
-    new_gen = new_gen[:5]
+def log_board(col_board):
+        board = transpose(col_board)
+        for i in range(len(board)):
+            row = board[i]
+            row_string = ''
+            for space in row:
+                if space == None:
+                    row_string += '_|'
+                else:
+                    row_string += str(space) + '|'
+            print(row_string[:-1])
+        print('\n')
 
-    gen_alg.fight(gen_1, new_gen)
-    vs_gen_1_score.append(sum([p.score for p in new_gen]))
-print(vs_gen_1_score)
-'''
-test = 'hi my name is 1'
-test_ints = []
-for elem in test:
-    try:
-        test_ints.append(int(elem))
-    except:
-        continue
+def possible_moves(col_board):
+    return [i for i,col in enumerate(col_board) if col.count(0)>0]
 
-print(test_ints)
+col_board = [[0,0,0,0,0,1],[0,0,0,0,0,0],[0,0,0,0,0,2],[0,0,0,0,0,0,],[0,0,0,0,0,0,],[0,0,0,0,0,0],[0,0,0,0,0,0]]
+print(possible_moves(col_board))
