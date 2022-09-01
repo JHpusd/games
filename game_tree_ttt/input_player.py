@@ -48,7 +48,7 @@ class InputPlayer:
 
     if row_col not in choices:
       print('Invalid choice')
-      self.choose_move(game_state)
+      return self.choose_move(game_state)
     
     return row_col
   
