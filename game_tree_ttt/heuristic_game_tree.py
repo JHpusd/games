@@ -1,4 +1,5 @@
 from game_nodes import *
+import copy
 
 class HeuristicGameTree():
     def __init__(self, root_state, player_num, h_func, ply):
@@ -29,26 +30,45 @@ class HeuristicGameTree():
             children.append(child)
             self.all_nodes[str(board_copy)] = child
         node.children = children
+    
+    def prune(self): # done after new root is set by player
+        current = [self.root]
+        next_layer = self.root.children
+        for _ in range(self.ply - 3):
+            current = next_layer
+            next_layer = []
+            for node in current:
+                next_layer += node.children
+        self.current_nodes = next_layer
 
-    def create_game_tree(self):
-        if len(self.current_nodes) == 0:
-            self.current_nodes = [self.root]
-            return
+    def init_create_game_tree(self):
+        for _ in range(self.ply):
+            if len(self.current_nodes) == 0:
+                self.current_nodes = [self.root]
+                return
+            all_children = []
+            for node in self.current_nodes:
+                self.create_node_children(node)
+                if len(node.children) != 0:
+                    all_children += node.children
+                else:
+                    self.terminal_nodes += 1
+            self.current_nodes = all_children
+    
+    def extend_game_tree(self): # only run after pruning
         all_children = []
         for node in self.current_nodes:
-            child_boards = self.create_node_children(node)
+            self.create_node_children(node)
             if len(node.children) != 0:
                 all_children += node.children
             else:
                 self.terminal_nodes += 1
         self.current_nodes = all_children
-        self.create_game_tree()
     
     def set_node_scores(self):
         assert len(self.root.children) != 0, "create game tree before setting scores"
         self.root.set_score()
-        return
-    
+
     def get_move_from_boards(self, base_state, new_state):
         base_state_children = self.all_nodes[str(base_state)].children
         assert new_state in [child.state for child in base_state_children]

@@ -90,13 +90,13 @@ class HeuristicGameNode():
     def set_score(self):
         if self.children == None or len(self.children) == 0:
             if self.winner == self.player:
-                self.score = 
+                self.score = 1
             elif self.winner == 3 - self.player:
                 self.score = -1
             elif self.winner == 'Tie':
                 self.score = 0
             else:
-                self.score = self.func(self.state, self.player)
+                self.score = self.func(self.state, self.player, self.turn)
             return
 
         #print([child.state for child in self.children])

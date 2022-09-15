@@ -1,4 +1,5 @@
 from game_nodes import *
+import copy
 
 class ReducedGameTree():
     def __init__(self, root_state, player_num):

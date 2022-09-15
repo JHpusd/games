@@ -1,6 +1,4 @@
-import sys
-sys.path.append('games-cohort-2/tic-tac-toe')
-from game_tree import *
+from reduced_game_tree import *
 
 class MinimaxPlayer():
     def __init__(self):
