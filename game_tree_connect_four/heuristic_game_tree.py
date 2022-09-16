@@ -12,7 +12,7 @@ class HeuristicGameTree():
         self.func = h_func
         self.ply = ply
     
-    def create_node_children(self, node):
+    def create_node_children(self, node): # make this work for c4
         if node.winner != None or len(node.children) != 0:
             return
         board = node.state
@@ -54,8 +54,6 @@ class HeuristicGameTree():
             for node in self.current_nodes:
                 self.create_node_children(node)
                 all_children += node.children
-            self.current_nodes = set(all_children)
-            print(len(self.current_nodes))
     
     def extend_game_tree(self): # only run after pruning
         all_children = []
@@ -67,17 +65,25 @@ class HeuristicGameTree():
     def set_node_scores(self):
         assert len(self.root.children) != 0, "create game tree before setting scores"
         self.root.set_score()
+    
+    def transpose(self, board):
+        t_board = []
+        for i in range(len(board[0])):
+            t_row = []
+            for arr in board:
+                t_row.append(arr[i])
+            t_board.append(t_row)
+        return t_board
 
     def get_move_from_boards(self, base_state, new_state):
         base_state_children = self.all_nodes[str(base_state)].children
         assert new_state in [child.state for child in base_state_children]
 
-        for i in range(len(new_state)):
-            for j in range(len(new_state[0])):
-                base = base_state[i][j]
-                new = new_state[i][j]
-                if base != new:
-                    return (i,j)
+        base_cols = self.transpose(base_state)
+        new_cols = self.transpose(new_state)
+        for i in range(len(base_cols)):
+            if base_cols[i] != new_cols[i]:
+                return i+1
     
     def get_best_move(self):
         base_state = self.root.state

@@ -7,6 +7,7 @@ class ReducedGameTree():
         self.player = player_num
         self.current_nodes = [self.root] # for creating the game tree
         self.terminal_nodes = 0
+        self.total_nodes = 1
         self.all_nodes = {str(root_state):self.root}
     
     def create_node_children(self, node):
@@ -27,20 +28,20 @@ class ReducedGameTree():
             child.previous = [node]
             children.append(child)
             self.all_nodes[str(board_copy)] = child
+            self.total_nodes += 1
+            if child.winner != None:
+                self.terminal_nodes += 1
         node.children = children
 
-    def create_game_tree(self):
+    def create_game_tree(self): # fix current nodes stuff
         if len(self.current_nodes) == 0:
             self.current_nodes = [self.root]
             return
         all_children = []
         for node in self.current_nodes:
-            child_boards = self.create_node_children(node)
-            if len(node.children) != 0:
-                all_children += node.children
-            else:
-                self.terminal_nodes += 1
-        self.current_nodes = all_children
+            self.create_node_children(node)
+            all_children += node.children
+        self.current_nodes = set(all_children)
         self.create_game_tree()
     
     def set_node_scores(self):
