@@ -34,7 +34,7 @@ class ConnectFour():
             row = self.board[i]
             row_string = ''
             for space in row:
-                if space == None:
+                if space == 0:
                     row_string += '_|'
                 else:
                     row_string += str(space) + '|'
@@ -63,6 +63,10 @@ class ConnectFour():
         i_r = col[::-1].index(0)
         col[len(col)-1-i_r] = player_num
         self.board = self.transpose(col_board)
+        '''
+        for player in self.players:
+            player.update_board(self.board)
+        '''
     
     def complete_round(self):
         for player in self.players:
@@ -74,8 +78,8 @@ class ConnectFour():
             self.make_move(player.number, move)
             if self.check_for_winner() != None:
                 self.winner = self.check_for_winner()
-                for player in self.players:
-                    player.report_winner(self.winner, self.board)
+                #for player in self.players:
+                    #player.report_winner(self.winner, self.board)
                 break
         self.round += 1
         self.log_board()
@@ -127,7 +131,7 @@ class ConnectFour():
             if len(set(len_four)) == 1:
                 return val
     
-    def check_for_winner(self):
+    def check_for_winner(self): # need to fix
         rows = self.board
         cols = self.transpose()
         diags = self.get_diags()
@@ -138,8 +142,15 @@ class ConnectFour():
             if winner != None:
                 self.winner = winner
                 return winner
-        if 0 not in [item for item in arr for arr in rcd]:
+        if 0 not in self.flatten(rcd):
             return 'Tie'
+    
+    def flatten(self, nested_arrs):
+        flat_arr = []
+        for arr in nested_arrs:
+            for item in arr:
+                flat_arr.append(item)
+        return flat_arr
     
     def run_to_completion(self):
         while self.winner == None:

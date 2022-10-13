@@ -1,6 +1,6 @@
 
 class HeuristicGameNode():
-    def __init__(self, game_state, player_turn, player_num, h_func):
+    def __init__(self, game_state, player_turn, player_num):
         self.state = game_state
         self.turn = player_turn
         self.player = player_num
@@ -8,8 +8,6 @@ class HeuristicGameNode():
         self.previous = []
         self.children = []
         self.score = None
-        self.added_coord = None # for non-root nodes
-        self.func = h_func
     
     def transpose(self, board=None):
         if board == None:
@@ -37,7 +35,7 @@ class HeuristicGameNode():
             elems.append(self.state[coord[0]][coord[1]])
         return elems
     
-    def get_diags(self):
+    def get_diags(self, state=None):
         coords = [[0,i] for i in range(7)]+[[5,2],[5,3],[5,4]]
         diags = []
         for coord in coords:
@@ -59,7 +57,7 @@ class HeuristicGameNode():
         for diag in diags:
             diag_elems.append(self.coords_to_elem(diag))
         
-        return diag_elems
+        return [diag_elems, diags]
     
     def check_len_four(self, arr):
         for i,val in enumerate(arr[:-3]):
@@ -69,10 +67,14 @@ class HeuristicGameNode():
             if len(set(len_four)) == 1:
                 return val
     
+    def get_options(self):
+        col_board = self.transpose()
+        return [i for i,col in enumerate(col_board) if 0 in col]
+    
     def check_for_winner(self):
         rows = self.state
         cols = self.transpose()
-        diags = self.get_diags()
+        diags = self.get_diags()[0]
         rcd = rows + cols + diags
 
         for arr in rcd:
@@ -80,8 +82,15 @@ class HeuristicGameNode():
             if winner != None:
                 self.winner = winner
                 return winner
-        if 0 not in [item for item in arr for arr in rcd]:
+        if 0 not in self.flatten(rcd):
             return 'Tie'
+    
+    def flatten(self, nested_arrs):
+        flat_arr = []
+        for arr in nested_arrs:
+            for item in arr:
+                flat_arr.append(item)
+        return flat_arr
     
     def children_to_score(self):
         if self.children == None or len(self.children) == 0:
@@ -93,13 +102,13 @@ class HeuristicGameNode():
     def set_score(self):
         if self.children == None or len(self.children) == 0:
             if self.winner == self.player:
-                self.score = 1
+                self.score = 9999
             elif self.winner == 3 - self.player:
-                self.score = -1
+                self.score = -9999
             elif self.winner == 'Tie':
                 self.score = 0
             else:
-                self.score = self.func(self.state, self.player, self.turn)
+                self.score = self.heuristic_func()
             return
 
         #print([child.state for child in self.children])
@@ -107,3 +116,162 @@ class HeuristicGameNode():
             self.score = max(self.children_to_score())
         elif self.turn == 3 - self.player:
             self.score = min(self.children_to_score())
+    
+    def print_board(self):
+        for i in range(len(self.state)):
+            row = self.state[i]
+            row_string = ''
+            for space in row:
+                if space == None:
+                    row_string += '_|'
+                else:
+                    row_string += str(space) + '|'
+            print(row_string[:-1])
+        print('\n')
+    
+    # includes target coord
+    def three_in_four(self, arr): # ex. 0 1 1 0 1 0 -> 1
+        for i,val in enumerate(arr[:-3]):
+            len_four = arr[i:i+4]
+            if len_four.count(1)==3 and 0 in len_four:
+                return (1, i+len_four.index(0))
+            elif len_four.count(2)==3 and 0 in len_four:
+                return (2, i+len_four.index(0))
+
+    # does not include target coord
+    def two_in_four(self, arr):
+        for i,val in enumerate(arr[:-3]):
+            len_four = arr[i:i+4]
+            if len_four.count(1)==2 and len_four.count(0)==2:
+                return 1
+            elif len_four.count(2)==2 and len_four.count(0)==2:
+                return 2
+
+    # includes target coord(s)
+    def open_ended_three(self, arr):
+        for i,val in enumerate(arr[:-4]):
+            len_five = arr[i:i+5]
+            if len_five[1]==0:
+                continue
+            if len(set(len_five[1:-1]))==1 and len_five.count(0)==2:
+                return (len_five[1], [i,i+4])
+
+    def heuristic_func(self):
+        # wins and ties caught by tree, no need to check here
+        game_state = self.state
+        rows = game_state
+        cols = self.transpose(game_state)
+        diags = self.get_diags()
+        diag_elems = diags[0]
+        diag_coords = diags[1]
+        #rcd = rows + cols + diags 
+
+        open_threes = {self.player:0, 3-self.player:0} # only in diags and rows
+        threat_threes = {self.player:0, 3-self.player:0} # three where opening is movable
+        # make win/loss next turn true at the end if threat_threes >= 2
+        threat_coords = {self.player:[], 3-self.player:[]}
+        threes = {self.player:0, 3-self.player:0}
+        twos = {self.player:0, 3-self.player:0}
+        advantage = 0
+        if self.player == self.turn:
+            advantage += 1
+        elif self.player == 3-self.turn:
+            advantage -= 1
+        
+        # if there is a win chance for turn player, score as win/loss - includes open ended
+        # if there is open three, imminent loss/win 
+
+        for i,row in enumerate(rows):
+            potential = self.three_in_four(row)
+            open_three = self.open_ended_three(row)
+            if self.two_in_four(row) != None:
+                twos[self.two_in_four(row)] += 1
+            if potential != None:
+                threes[potential[0]] += 1
+                coord = (i,potential[1])
+                if i == 5 or self.state[i+1][potential[1]] != 0: # if opening is movable
+                    if potential[0] == self.turn:
+                        if self.turn == self.player:
+                            return 1000
+                        if self.turn == 3-self.player:
+                            return -1000
+                    if coord not in threat_coords[potential[0]]:
+                        threat_threes[potential[0]] += 1
+                        threat_coords[potential[0]].append(coord)
+            if open_three != None:
+                open_threes[open_three[0]] += 1
+                col_idxs = open_three[1]
+                coords = [(i,col_idx) for col_idx in col_idxs]
+                for coord in coords:
+                    if i == 5 or self.state[coord[0]+1][coord[1]] != 0:
+                        if coord not in threat_coords[open_three[0]]:
+                            threat_threes[open_three[0]] += 1
+                            threat_coords[open_three[0]].append(coord)
+        
+        for i,col in enumerate(cols):
+            potential = self.three_in_four(col)
+            if self.two_in_four(col) != None:
+                twos[self.two_in_four(col)] += 1
+            if potential != None:
+                threes[potential[0]] += 1
+                coord = (potential[1],i)
+                if potential[0] == self.turn:
+                    if self.turn == self.player:
+                        return 1000
+                    if self.turn == 3-self.player:
+                        return -1000
+                if coord not in threat_coords[potential[0]]:
+                    threat_threes[potential[0]] += 1
+                    threat_coords[potential[0]].append(coord)
+        
+        for i,diag in enumerate(diag_elems):
+            potential = self.three_in_four(diag)
+            open_three = self.open_ended_three(diag)
+            if self.two_in_four(diag):
+                twos[self.two_in_four(diag)] += 1
+            if potential != None:
+                threes[potential[0]] += 1
+                coord = diag_coords[i][potential[1]]
+                if coord[0] == 5 or self.state[coord[0]+1][coord[1]] != 0:
+                    if potential == self.turn:
+                        if self.turn == self.player:
+                            return 1000
+                        if self.turn == 3-self.player:
+                            return -1000
+                    if coord not in threat_coords[potential[0]]:
+                        threat_threes[potential[0]] += 1
+                        threat_coords[potential[0]].append(coord)
+            if open_three != None:
+                open_threes[open_three[0]] += 1
+                coords = [diag_coords[i][col_idx] for col_idx in open_three[1]]
+                for coord in coords:
+                    if coord[0] == 5 or self.state[coord[0]+1][coord[1]] != 0:
+                        if coord not in threat_coords[potential[0]]:
+                            threat_threes[potential[0]] += 1
+                            threat_coords[potential[0]].append(threat_coords)
+
+        if threat_threes[self.player] >= 2:
+            return 1000
+        if threat_threes[3-self.player] >= 2:
+            return -1000
+        
+        advantage += twos[self.player]-twos[3-self.player]
+        advantage += 3*(threes[self.player]-threes[3-self.player])
+        advantage += 6*(open_threes[self.player]-open_threes[3-self.player])
+        return advantage
+
+'''
+state = [
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,2,0,0,0],
+    [1,0,2,2,1,0,0],
+    [1,2,1,1,1,2,0]
+]
+
+node = HeuristicGameNode(state, 2, 2) # turn, player
+node.set_score()
+print(node.winner)
+print(node.score)
+'''
