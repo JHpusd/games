@@ -31,6 +31,8 @@ class HeuristicPlayer():
                     return
     '''
     def choose_move(self, game_state, choices):
+        # for anton's game
+        # game_state = self.transpose(game_state)
         self.tree.root = self.tree.all_nodes[str(game_state)]
         self.tree.prune()
         self.tree.extend_game_tree()

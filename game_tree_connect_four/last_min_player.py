@@ -72,6 +72,8 @@ class LastMinPlayer():
                 return (len_five[1],[i,i+4])
     
     def choose_move(self, board, choices):
+        # for anton's game
+        # board = self.transpose(board)
         rows = board
         cols = self.transpose(board)
         diags = self.get_diags(board)
