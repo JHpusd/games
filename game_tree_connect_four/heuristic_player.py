@@ -5,6 +5,15 @@ class HeuristicPlayer():
         self.number = None
         self.ply = ply
     
+    def transpose(self, board):
+        t_board = []
+        for i in range(len(board[0])):
+            t_row = []
+            for arr in board:
+                t_row.append(arr[i])
+            t_board.append(t_row)
+        return t_board
+    
     def set_player_number(self, player_num):
         init_state = [[0 for _ in range(7)] for _ in range(6)]
         self.number = player_num
