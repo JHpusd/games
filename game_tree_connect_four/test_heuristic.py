@@ -3,13 +3,13 @@ from heuristic_player import *
 from input_player import *
 from random_player import *
 from last_min_player import *
-from anton_last_min import *
+from anton_comp import *
 from cayden_last_min import *
 from charlie_last_min import *
 from maia_last_min import *
 from connect_four import *
 
-players = [LastMinPlayer(), MaiaLastMinPlayer()]
+players = [LastMinPlayer(), AntonHeuristicPlayer()]
 game = ConnectFour(players)
 game.run_to_completion()
 print(game.winner)

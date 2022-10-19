@@ -372,7 +372,7 @@ class HeuristicGameTree():
         return result
 
 class HeuristicPlayer():
-    def __init__(self, ply):
+    def __init__(self, ply=4):
         self.number = None
         self.ply = ply
     
