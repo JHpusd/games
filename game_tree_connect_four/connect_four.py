@@ -74,7 +74,7 @@ class ConnectFour():
             move = player.choose_move(self.board, choices)
             if move not in choices:
                 move = choices[0]
-                logs.write(f'Player {player.number} made invalid move')
+                self.logs.write(f'Player {player.number} made invalid move')
             self.make_move(player.number, move)
             if self.check_for_winner() != None:
                 self.winner = self.check_for_winner()

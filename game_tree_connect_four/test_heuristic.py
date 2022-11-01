@@ -4,39 +4,34 @@ from input_player import *
 from random_player import *
 from last_min_player import *
 from anton_comp import *
-from cayden_last_min import *
-from charlie_last_min import *
-from maia_last_min import *
+from cayden_comp import *
+from charlie_comp import *
+from maia_comp import *
+from william_comp import *
 from connect_four import *
 
-players = [LastMinPlayer(), AntonHeuristicPlayer()]
-game = ConnectFour(players)
-game.run_to_completion()
-print(game.winner)
 
-'''
-wins = {'lastmin':0, 'heuristic':0}
+wins = {'william':0, 'maia':0}
 game_count = 1
-for _ in range(5):
-    players = [LastMinPlayer(), HeuristicPlayer(4)]
+for _ in range(2):
+    players = [WilliamHeuristicPlayer(), MaiaHeuristicPlayer()]
     game = ConnectFour(players)
     game.run_to_completion()
     if game.winner == 1:
-        wins['lastmin'] += 1
+        wins['william'] += 1
     if game.winner == 2:
-        wins['heuristic'] += 1
+        wins['maia'] += 1
     print(f'finished game {game_count}')
     game_count += 1
 
-for _ in range(5):
-    players = [HeuristicPlayer(4), LastMinPlayer()]
+for _ in range(2):
+    players = [MaiaHeuristicPlayer(), WilliamHeuristicPlayer()]
     game = ConnectFour(players)
     game.run_to_completion()
     if game.winner == 1:
-        wins['heuristic'] += 1
+        wins['maia'] += 1
     if game.winner == 2:
-        wins['lastmin'] += 1
+        wins['william'] += 1
     print(f'finished game {game_count}')
     game_count += 1
 print(wins)
-'''

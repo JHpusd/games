@@ -1,7 +1,7 @@
 from heuristic_game_tree import *
 
 class HeuristicPlayer():
-    def __init__(self, ply):
+    def __init__(self, ply=4):
         self.number = None
         self.ply = ply
     
