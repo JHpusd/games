@@ -141,7 +141,7 @@ class FogelEvolvingNet():
         for out_node in self.out_layer:
             out_node.info_from.remove(rand_node)
     
-    def replicate(self):
+    def replicate(self): # all replicated nets are initialized
         new_net = self.make_copy()
         # weight incrementing
         for key in new_net.weights:
@@ -155,12 +155,15 @@ class FogelEvolvingNet():
                 new_net.add_h_node()
             else: # delete case
                 new_net.del_h_node()
+    
+    def initialize(self):
+        self.create_layers()
+        self.create_weights()
+        self.connect_nodes()
                 
-
+'''
 net = FogelEvolvingNet()
-net.create_layers()
-net.create_weights()
-net.connect_nodes()
+net.initialize()
 
 print([n.num for n in net.out_layer])
 print([n.num for n in net.h_layer])
@@ -174,3 +177,4 @@ print([n.num for n in net.in_layer])
 print(net.input_array([0,0,0,0,0,0,0,0,0]))
 print(len(net.weights))
 #print(net.weights)
+'''
