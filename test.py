@@ -1,3 +1,4 @@
 import random, numpy, math
 
-print(math.floor(1.9))
+test = (1,2,3,4)
+print(sum(list(test)))
