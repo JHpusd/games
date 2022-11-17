@@ -1,4 +1,4 @@
-import random, math, numpy
+import random, math, numpy, copy
 from node import *
 
 class FogelEvolvingNet():
@@ -101,11 +101,12 @@ class FogelEvolvingNet():
     
     def make_copy(self):
         new_net = FogelEvolvingNet()
-        new_net.num_H = self.num_H
-        new_net.create_layers()
-        new_net.weights = self.weights
+        new_net.in_layer = copy.deepcopy(self.in_layer)
+        new_net.h_layer = copy.deepcopy(self.h_layer)
+        new_net.out_layer = copy.deepcopy(self.out_layer)
+        new_net.weights = {key:self.weights[key] for key in self.weights}
         new_net.connect_nodes()
-        new_net.counter = self.counter
+        new_net.counter = int(self.counter)
         return new_net
     
     def add_h_node(self):
@@ -155,8 +156,12 @@ class FogelEvolvingNet():
                 new_net.add_h_node()
             else: # delete case
                 new_net.del_h_node()
+
+        return new_net
     
     def initialize(self):
+        if len(self.in_layer) != 0:
+            return
         self.create_layers()
         self.create_weights()
         self.connect_nodes()
@@ -170,11 +175,11 @@ print([n.num for n in net.h_layer])
 print([n.num for n in net.in_layer])
 print(net.input_array([0,0,0,0,0,0,0,0,0]))
 print(len(net.weights))
-net.add_h_node()
-print([n.num for n in net.out_layer])
-print([n.num for n in net.h_layer])
-print([n.num for n in net.in_layer])
-print(net.input_array([0,0,0,0,0,0,0,0,0]))
-print(len(net.weights))
+new_net = net.replicate()
+print([n.num for n in new_net.out_layer])
+print([n.num for n in new_net.h_layer])
+print([n.num for n in new_net.in_layer])
+print(new_net.input_array([0,0,0,0,0,0,0,0,0]))
+print(len(new_net.weights))
 #print(net.weights)
 '''

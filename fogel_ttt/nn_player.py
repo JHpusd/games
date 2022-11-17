@@ -2,13 +2,16 @@ from fogel_nn import *
 import math
 
 class NeuralNetPlayer():
-    def __init__(self):
+    def __init__(self, net=None):
         self.number = None
-        self.net = FogelEvolvingNet()
+        if net != None:
+            self.net = net
+        else:
+            self.net = FogelEvolvingNet()
+        self.score = 0
     
     def set_player_number(self, num):
-        self.number = num # should always be player 1 for now
-        self.net.initialize()
+        self.number = num
     
     def update_board(self, game_state):
         pass
@@ -36,6 +39,13 @@ class NeuralNetPlayer():
             max_idx = outputs.index(max(out_vals))
         
         return self.idx_to_coord(max_idx)
+    
+    def initialize_net(self):
+        self.net.initialize()
+    
+    def replicate(self):
+        new_net = self.net.replicate()
+        return NeuralNetPlayer(new_net)
     
     def report_winner(self, winner_num, board):
         pass

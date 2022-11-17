@@ -43,38 +43,31 @@ class NearPerfectPlayer():
         choices = [(i,j) for i in range(len(game_state)) for j in range(len(game_state)) if game_state[i][j]==None]
         rng = random.randint(1,10)
         if rng == 1:
-            print('RANDOM')
             return random.choice(choices)
         
         for choice in choices:
             new_state = self.insert_move(game_state, choice, self.number)
             if self.check_for_winner(new_state) == self.number:
-                print('winner')
                 return choice
         for choice in choices:
             new_state = self.insert_move(game_state, choice, 3-self.number)
             if self.check_for_winner(new_state) == 3-self.number:
-                print('prevent loss')
                 return choice
         rcd = self.get_row_col_diag(game_state)
         for i,row in enumerate(rcd[0]):
             if row.count(None) == 2 and row.count(3-self.number) == 1:
-                print('row')
                 return (i,random.choice([n for n,item in enumerate(row) if item == None]))
         for i,col in enumerate(rcd[1]):
             if col.count(None) == 2 and col.count(3-self.number) == 1:
-                print('col')
                 return (random.choice([n for n,item in enumerate(col) if item == None]),i)
         diag_1 = [(0,0), (1,1), (2,2)]
         diag_2 = [(0,2), (1,1), (2,0)]
         for i,diag in enumerate(rcd[2]):
             if diag.count(None) == 2 and diag.count(3-self.number) == 1:
-                print('diag')
                 if i == 0:
                     return diag_1[random.choice([n for n,item in enumerate(diag) if item==None])]
                 return diag_2[random.choice([n for n,item in enumerate(diag) if item==None])]
         
-        print('RANDOM')
         return random.choice(choices)
     
     def report_winner(self, winner_num, board):
