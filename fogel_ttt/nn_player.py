@@ -1,5 +1,5 @@
 from fogel_nn import *
-import math
+import math, pickle, copy
 
 class NeuralNetPlayer():
     def __init__(self, net=None):
@@ -8,7 +8,8 @@ class NeuralNetPlayer():
             self.net = net
         else:
             self.net = FogelEvolvingNet()
-        self.score = 0
+        self.payoff_score = 0
+        self.eval_score = 0
     
     def set_player_number(self, num):
         self.number = num

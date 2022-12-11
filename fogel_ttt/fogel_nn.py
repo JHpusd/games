@@ -10,24 +10,28 @@ class FogelEvolvingNet():
         self.weights = {}
         self.counter = 1
     
+    def lin_func(self, x):
+        return x
+    
+    def sig_func(self, x):
+        return 1/(1+(math.e)**-x)
+    
     def create_layers(self):
         # input layer
-        func = lambda x: x
         for _ in range(9):
-            self.in_layer.append(NetNode(self.counter, func))
+            self.in_layer.append(NetNode(self.counter,self.lin_func))
             self.counter += 1
-        self.in_layer.append(NetNode(self.counter, func, True))
+        self.in_layer.append(NetNode(self.counter,self.lin_func,True))
         self.counter += 1
         # hidden layer
-        func = lambda x: 1/(1+(math.e)**-x)
         for _ in range(self.num_H):
-            self.h_layer.append(NetNode(self.counter, func))
+            self.h_layer.append(NetNode(self.counter,self.sig_func))
             self.counter += 1
-        self.h_layer.append(NetNode(self.counter, func, True))
+        self.h_layer.append(NetNode(self.counter,self.sig_func,True))
         self.counter += 1
         # output layer
         for _ in range(9):
-            self.out_layer.append(NetNode(self.counter, func))
+            self.out_layer.append(NetNode(self.counter,self.sig_func))
             self.counter += 1
     
     def create_weights(self):
@@ -112,8 +116,7 @@ class FogelEvolvingNet():
     def add_h_node(self):
         if len(self.h_layer) == 11:
             return
-        func = lambda x: 1/(1+(math.e)**-x)
-        new_node = NetNode(self.counter, func)
+        new_node = NetNode(self.counter,self.sig_func)
         self.h_layer.append(new_node)
         self.counter += 1
 
