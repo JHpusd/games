@@ -77,8 +77,8 @@ class EvolvingNetPlayers():
     def gen_copy(self):
         return copy.deepcopy(self.players)
 
-gens = [i for i in range(100)]
-max_payoffs = [0 for _ in range(100)]
+gens = [i for i in range(80)]
+max_payoffs = [0 for _ in range(80)]
 
 file = open('nn_players.pickle', 'wb')
 for i in range(20): # make 20
@@ -86,7 +86,7 @@ for i in range(20): # make 20
     enp.init_first_gen()
     print(f'trial {i+1}')
     print('initialized first gen')
-    for gen_id in range(100): # make 100 or 50
+    for gen_id in range(80): # make 100
         enp.make_new_gen()
         max_payoff = max(enp.prev_gen_payoffs)
         print(f'trial {i+1} gen {enp.gen_num-1} max payoff: {max_payoff}')
