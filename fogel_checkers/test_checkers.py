@@ -1,5 +1,6 @@
 from checkers import *
 from input_player import *
+from semirandom_player import *
 from random_player import *
 from test_player import *
 
