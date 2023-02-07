@@ -1,4 +1,4 @@
-import sys
+import sys, math, random
 from test_player import *
 from random import random
 sys.path.append('game_tree_logs')
@@ -29,46 +29,44 @@ class Checkers():
             return None
     
     def get_moves(self, coord):
-        player_num = abs(self.coord_val(coord))
+        coord_val = self.coord_val(coord)
         moves = []
-        if player_num == 0:
+        options = []
+        if coord_val == 0:
             return []
-        if player_num == 1:
+        if coord_val == 1:
             options = [(-1,1),(-1,-1)]
-            for option in options:
-                if self.coord_val(self.arr_add(option, coord)) == 0:
-                    moves.append([coord, option])
-        if player_num == 2:
+        if coord_val == 2:
             options = [(1,1),(1,-1)]
-            for option in options:
-                if self.coord_val(self.arr_add(option, coord)) == 0:
-                    moves.append([coord, option])
+        if coord_val < 0:
+            options = [(-1,1),(-1,-1),(1,1),(1,-1)]
+        for option in options:
+            if self.coord_val(self.arr_add(option, coord)) == 0:
+                moves.append([coord, option])
         return moves
     
     def get_captures(self, coord):
-        player_num = abs(self.coord_val(coord))
+        coord_val = self.coord_val(coord)
         captures = []
-        if player_num == 0:
+        if coord_val == 0:
             return []
-        if player_num == 1:
-            check = [self.arr_add(coord,(-1,1)),self.arr_add(coord,(-1,-1))]
+        if coord_val == 1:
             options = [(-2,2),(-2,-2)]
-            option_coords = [self.arr_add(coord,opt) for opt in options]
-            for i, check_coord in enumerate(check):
-                if self.coord_val(check_coord) == 3-player_num:
-                    if self.coord_val(option_coords[i]) == 0:
-                        captures.append([coord, options[i]])
-        if player_num == 2:
-            check = [self.arr_add(coord,(1,1)),self.arr_add(coord,(1,-1))]
+        if coord_val == 2:
             options = [(2,2),(2,-2)]
-            option_coords = [self.arr_add(coord,opt) for opt in options]
-            for i, check_coord in enumerate(check):
-                if self.coord_val(check_coord) == 3-player_num:
-                    if self.coord_val(option_coords[i]) == 0:
-                        captures.append([coord, options[i]])
+        if coord_val < 0:
+            options = [(-2,2),(-2,-2),(2,2),(2,-2)]
+        for capture in options:
+            if self.coord_val(self.arr_add(coord, capture)) != 0:
+                continue
+            direction = (int(capture[0]/2), int(capture[1]/2))
+            check_coord = self.arr_add(coord, direction)
+            check_coord_val = self.coord_val(check_coord)
+            if check_coord_val == 3-abs(coord_val):
+                captures.append([coord, capture])
         return captures
     
-    def get_valid_moves(self, player):
+    def get_all_moves(self, player):
         valid_moves = []
         player_num = player.player_num
         for i, row in enumerate(self.board):
@@ -81,15 +79,97 @@ class Checkers():
         return valid_moves
 
     def print_board(self):
-        for row in self.board:
-            print(row)
+        print("\n  0 1 2 3 4 5 6 7")
+        for i in range(8):
+            row_to_print = f"{i} "
+            for j in range(8):
+                elem = self.board[i][j]
+                if elem == 0:  row_to_print += "⬜" if ((i + j) % 2 == 0) else "  "
+                if elem == 1:  row_to_print += "🔵"
+                if elem == 2:  row_to_print += "🔴"
+                if elem == -1: row_to_print += "💙"
+                if elem == -2: row_to_print += "❤️ "
+            print(row_to_print)
+    
+    def check_promotions(self):
+        top_row = self.board[0]
+        bottom_row = self.board[7]
+        for i, item in enumerate(top_row):
+            if item == 1:
+                self.board[0][i] = -1
+        for i, item in enumerate(bottom_row):
+            if item == 2:
+                self.board[7][i] = -2
+    
+    def del_captured_piece(self, capt_move):
+        coord = capt_move[0]
+        translation = capt_move[1]
+        if abs(translation[0]) != 2:
+            return
+        direction = (int(translation[0]/2), int(translation[1]/2))
+        capt_coord = self.arr_add(coord, direction)
+        self.board[capt_coord[0]][capt_coord[1]] = 0
+    
+    def flatten(self, nested_arr):
+        result = []
+        for arr in nested_arr:
+            result += arr
+        return result
     
     def run_turn(self):
-        for player in players:
+        for player in self.players:
+            if self.winner != None:
+                return
+            options = self.get_all_moves(player)
+            if len(options) == 0:
+                self.winner = 3-player.player_num
+                continue
+            move = player.choose_move(self.board, options)
+            if move not in options:
+                move = random.choice(options)
+            self.del_captured_piece(move)
             
+            coord = move[0]
+            coord_val = self.coord_val(coord)
+            translation = move[1]
+            new_coord = self.arr_add(coord, translation)
+            self.board[coord[0]][coord[1]] = 0
+            self.board[new_coord[0]][new_coord[1]] = coord_val
+            self.check_promotions()
 
-p1 = TestPlayer()
-p2 = TestPlayer()
-test = Checkers([p1,p2])
-test.print_board()
-print(test.get_valid_moves(p2))
+            while abs(translation[0]) == 2:
+                no_move_opt = [[new_coord, (0,0)]]
+                chain_opts = self.get_captures(new_coord)
+                options = chain_opts + no_move_opt
+                move = player.choose_move(self.board, options)
+                self.del_captured_piece(move)
+                coord = move[0]
+                coord_val = self.coord_val(coord)
+                translation = move[1]
+                new_coord = self.arr_add(coord, translation)
+                self.board[coord[0]][coord[1]] = 0
+                self.board[new_coord[0]][new_coord[1]] = coord_val
+                self.check_promotions()
+
+        self.turn += 1
+        if self.turn >= 100:
+            self.winner = 'Tie'
+        flat_board = self.flatten(self.board)
+        flat_board = [abs(item) for item in flat_board]
+        if flat_board.count(1)==1 and flat_board.count(2)==1:
+            self.winner = 'Tie'
+    
+    def run_to_completion(self):
+        while self.winner == None:
+            self.run_turn()
+
+test_board = [
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,2,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,2,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,1,0,0,0,0],
+    [0,0,1,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+]
