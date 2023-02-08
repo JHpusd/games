@@ -79,7 +79,7 @@ class Checkers():
         return valid_moves
 
     def print_board(self):
-        print("\n  0 1 2 3 4 5 6 7")
+        print("\n   0 1 2 3 4 5 6 7")
         for i in range(8):
             row_to_print = f"{i} "
             for j in range(8):
