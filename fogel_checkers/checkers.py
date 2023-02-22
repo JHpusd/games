@@ -28,55 +28,94 @@ class Checkers():
         except:
             return None
     
-    def get_moves(self, coord):
-        coord_val = self.coord_val(coord)
-        moves = []
-        options = []
-        if coord_val == 0:
-            return []
-        if coord_val == 1:
-            options = [(-1,1),(-1,-1)]
-        if coord_val == 2:
-            options = [(1,1),(1,-1)]
-        if coord_val < 0:
-            options = [(-1,1),(-1,-1),(1,1),(1,-1)]
-        for option in options:
-            if self.coord_val(self.arr_add(option, coord)) == 0:
-                moves.append([coord, option])
-        return moves
+    def nested_list_in_list(self, parent_list, nested_list):
+        for l in parent_list:
+            if all(x == y for x, y in zip(l, nested_list)):
+                return True
+        return False
     
-    def get_captures(self, coord):
-        coord_val = self.coord_val(coord)
-        captures = []
-        if coord_val == 0:
-            return []
-        if coord_val == 1:
-            options = [(-2,2),(-2,-2)]
-        if coord_val == 2:
-            options = [(2,2),(2,-2)]
-        if coord_val < 0:
-            options = [(-2,2),(-2,-2),(2,2),(2,-2)]
-        for capture in options:
-            if self.coord_val(self.arr_add(coord, capture)) != 0:
-                continue
-            direction = (int(capture[0]/2), int(capture[1]/2))
-            check_coord = self.arr_add(coord, direction)
-            check_coord_val = self.coord_val(check_coord)
-            if check_coord_val == 3-abs(coord_val):
-                captures.append([coord, capture])
-        return captures
+    def find_translation(self, coord1, coord2):
+        return [coord1[0] - coord2[0], coord1[1] - coord2[1]]
     
-    def get_all_moves(self, player):
-        valid_moves = []
-        player_num = player.player_num
-        for i, row in enumerate(self.board):
-            for j, item in enumerate(row):
-                if abs(item) == player_num:
-                    moves = self.get_moves((i,j))
-                    captures = self.get_captures((i,j))
-                    valid_moves += captures
-                    valid_moves += moves
-        return valid_moves
+    def get_all_moves(self, player, state=None):
+        
+        if state == None: state = self.state
+
+        possible_moves = []
+
+        # loop through all coordinates
+
+        for i in range(8):
+            for j in range(8):
+
+                current_coords = [i, j]
+                current_piece = state[i][j]
+
+                # check if there is a piece on the current coord
+
+                if abs(current_piece) == player.player_num:
+
+                    # get moves that the piece might be able to do
+
+                    moves_to_check = self.add_moves_to_check(current_piece, current_coords, [], [])
+
+                    while len(moves_to_check) > 0:
+
+                        # check first move in moves_to_check
+
+                        move_to_check = moves_to_check.pop(0) # moves_to_check is a queue
+                        coord, translation_to_check, captured_coords = move_to_check
+
+                        new_i, new_j = self.arr_add(coord, translation_to_check)
+                        if new_i < 0 or new_i > 7 or new_j < 0 or new_j > 7: continue
+                        new_piece = state[new_i][new_j]
+
+                        # check if the new spot is empty
+
+                        if abs(new_piece) == 0 and captured_coords == []:
+                            possible_moves.append(move_to_check)
+                    
+                        # check if the opponent is in the new spot
+
+                        elif abs(new_piece) == 3 - player.player_num:
+                            
+                            # if so, and if the next next spot is empty, add that spot to moves_to_check
+
+                            next_translation = [2*t for t in translation_to_check]
+                            new_new_i, new_new_j = self.arr_add(coord, next_translation)
+                            if new_new_i < 0 or new_new_i > 7 or new_new_j < 0 or new_new_j > 7: continue
+                            new_new_piece = state[new_new_i][new_new_j]
+
+                            if abs(new_new_piece) == 0 and not self.nested_list_in_list(captured_coords, [new_i, new_j]):
+
+                                # add capture to possible moves
+
+                                previous_translation = self.find_translation(coord, current_coords)
+                                new_translation = self.arr_add(previous_translation, next_translation)
+                                new_captured_coords = captured_coords + [[new_i, new_j]]
+                                possible_moves.append([current_coords, new_translation, new_captured_coords])
+
+                                # add potential to combo captures
+
+                                next_next_coords = self.arr_add(current_coords, new_translation)
+                                moves_to_check = self.add_moves_to_check(current_piece, next_next_coords, new_captured_coords, moves_to_check)
+
+                                # then, it'll loop back to the start of moves_to_check
+        
+        return possible_moves
+
+    def add_moves_to_check(self, current_piece, current_coords, captured_coords, moves_to_check):
+        
+        direction = 1 - 2*(current_piece % 2)
+
+        moves_to_check.append([current_coords, [direction, -1], captured_coords])
+        moves_to_check.append([current_coords, [direction, 1], captured_coords])
+
+        if current_piece < 0:
+            moves_to_check.append([current_coords, [-direction, -1], captured_coords])
+            moves_to_check.append([current_coords, [-direction, 1], captured_coords])
+        
+        return moves_to_check
 
     def print_board(self):
         print("\n   0 1 2 3 4 5 6 7")
@@ -101,14 +140,9 @@ class Checkers():
             if item == 2:
                 self.board[7][i] = -2
     
-    def del_captured_piece(self, capt_move):
-        coord = capt_move[0]
-        translation = capt_move[1]
-        if abs(translation[0]) != 2:
-            return
-        direction = (int(translation[0]/2), int(translation[1]/2))
-        capt_coord = self.arr_add(coord, direction)
-        self.board[capt_coord[0]][capt_coord[1]] = 0
+    def del_captured_pieces(self, capt_move):
+        for capt_coord in capt_move[2]:
+            self.board[capt_coord[0]][capt_coord[1]] = 0
     
     def flatten(self, nested_arr):
         result = []
@@ -120,36 +154,21 @@ class Checkers():
         for player in self.players:
             if self.winner != None:
                 return
-            options = self.get_all_moves(player)
+            options = self.get_all_moves(player, self.board)
             if len(options) == 0:
                 self.winner = 3-player.player_num
                 continue
             move = player.choose_move(self.board, options)
             if move not in options:
                 move = random.choice(options)
-            self.del_captured_piece(move)
+            self.del_captured_pieces(move)
             
             coord = move[0]
             coord_val = self.coord_val(coord)
-            translation = move[1]
-            new_coord = self.arr_add(coord, translation)
-            self.board[coord[0]][coord[1]] = 0
+            new_coord = self.arr_add(coord,move[1])
             self.board[new_coord[0]][new_coord[1]] = coord_val
+            self.board[coord[0]][coord[1]] = 0
             self.check_promotions()
-
-            while abs(translation[0]) == 2:
-                no_move_opt = [[new_coord, (0,0)]]
-                chain_opts = self.get_captures(new_coord)
-                options = chain_opts + no_move_opt
-                move = player.choose_move(self.board, options)
-                self.del_captured_piece(move)
-                coord = move[0]
-                coord_val = self.coord_val(coord)
-                translation = move[1]
-                new_coord = self.arr_add(coord, translation)
-                self.board[coord[0]][coord[1]] = 0
-                self.board[new_coord[0]][new_coord[1]] = coord_val
-                self.check_promotions()
 
         self.turn += 1
         if self.turn >= 100:
