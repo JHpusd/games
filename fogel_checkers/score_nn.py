@@ -4,7 +4,7 @@ sys.path.append('fogel_ttt')
 from node import *
 
 class ScoringNeuralNet():
-    def __init__(self):
+    def __init__(self, replicated=False):
         self.in_layer = []
         self.h1_layer = []
         self.h2_layer = []
@@ -14,6 +14,9 @@ class ScoringNeuralNet():
         self.K = 2
         self.mutat_rate = 0.05
         self.counter = 1
+
+        if not replicated:
+            self.connect_nodes()
     
     def lin_func(self, x):
         return x
@@ -120,15 +123,31 @@ class ScoringNeuralNet():
             nodes[1].info_from.append(nodes[0])
 
     def score_board(self, adjusted_arr):
-        # board should be adjusted by player, made len 32
+        # board should be adjusted by player
+        # change values based on player num, made len 32
         if len(adjusted_arr) != 32:
             print('input arr must be len 32')
             return
+        # crowned values should be change to +/- 2 by player
+        new_arr = []
+        for i, val in enumerate(adjusted_arr):
+            if val == 2:
+                new_arr.append(self.K)
+            elif val == -2:
+                new_arr.append(-self.K)
+            else:
+                new_arr.append(val)
+        # input
+        in_node_sum = 0
         for i, in_node in enumerate(self.in_layer):
             if in_node.bias:
                 in_node.output_val = 1
                 continue
             in_node.set_vals(adjusted_arr[i])
+            in_node_sum += in_node.output_val
+        # piece difference node
+        self.pd_node.set_vals(in_node_sum)
+        # propogation through net
         for i, node in enumerate(self.h1_layer + self.h2_layer + self.out_layer):
             if node.bias:
                 node.output_val = 1
@@ -138,10 +157,10 @@ class ScoringNeuralNet():
                 weight = self.get_weight(in_node, node)
                 in_val += in_node.output_val * weight
             node.set_vals(in_val)
-        return [node.output_val for node in self.out_layer]
+        return self.out_layer[0].output_val
     
     def make_copy(self):
-        new_net = ScoringNeuralNet()
+        new_net = ScoringNeuralNet(True)
         new_net.in_layer = copy.deepcopy(self.in_layer)
         new_net.h1_layer = copy.deepcopy(self.h1_layer)
         new_net.h2_layer = copy.deepcopy(self.h2_layer)
@@ -178,6 +197,7 @@ class ScoringNeuralNet():
         
         return new_net
 
+'''
 test = ScoringNeuralNet()
 print('original nn:')
 test.connect_nodes()
@@ -189,3 +209,4 @@ print('replicated nn:')
 print(f'number of weights: {len(new_test.weights)}')
 print(f'mutat rate: {new_test.mutat_rate}')
 print(f'K val: {new_test.K}')
+'''
