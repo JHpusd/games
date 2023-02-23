@@ -11,8 +11,6 @@ class InputPlayer():
             self.player_color = 'red'
     
     def choose_move(self, board, options):
-        if len(options) == 1 and options[0][1][0] == 0:
-            return options[0]
         print(f'\nYou are player {self.player_num} ({self.player_color})')
         self.print_board(board)
         self.print_options(options)
@@ -51,7 +49,9 @@ class InputPlayer():
             coord = tuple(move[0])
             translation = move[1]
             new_coord = tuple(self.arr_add(coord, translation))
-            if abs(translation[0]) != 2:
+            if len(move[2]) == 0:
                 print(f'{i}: {coord} -> {new_coord}')
-            else:
+            if len(move[2]) == 1:
                 print(f'{i}: {coord} -> {new_coord} (capture)')
+            if len(move[2]) > 1:
+                print(f'{i}: {coord} -> {new_coord} ({len(move[2])} captures)')

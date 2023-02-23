@@ -4,8 +4,7 @@ sys.path.append('fogel_ttt')
 from node import *
 
 class ScoringNeuralNet():
-    def __init__(self, player_num):
-        self.player_num = player_num
+    def __init__(self):
         self.in_layer = []
         self.h1_layer = []
         self.h2_layer = []
@@ -155,13 +154,38 @@ class ScoringNeuralNet():
     
     def replicate(self):
         new_net = self.make_copy()
+        
         # mutation rate change
         norm = nr.normal(0,1)
-        denom = math.sqrt(2*math.sqrt(len(self.weights)))
-        new_net.mutat_rate = self.mutat_rate * (norm/denom)
+        denom = math.sqrt(2*math.sqrt(len(new_net.weights)))
+        coeff = math.e**(norm/denom)
+        new_net.mutat_rate = coeff * self.mutat_rate
+        
         # weight change
+        for key in new_net.weights:
+            norm = nr.normal(0,1)
+            shift = norm * new_net.mutat_rate
+            new_net.weights[key] += shift
+        
         # K change
+        norm = nr.normal(0,1)
+        coeff = math.e**(norm/math.sqrt(2))
+        new_net.K = coeff * self.K
+        if new_net.K < 1:
+            new_net.K = 1
+        if new_net.K > 3:
+            new_net.K = 3
+        
+        return new_net
 
-test = ScoringNeuralNet(1)
+test = ScoringNeuralNet()
+print('original nn:')
 test.connect_nodes()
-print(len(test.weights))
+print(f'number of weights: {len(test.weights)}')
+print(f'mutat rate: {test.mutat_rate}')
+print(f'K val: {test.K}')
+new_test = test.replicate()
+print('replicated nn:')
+print(f'number of weights: {len(new_test.weights)}')
+print(f'mutat rate: {new_test.mutat_rate}')
+print(f'K val: {new_test.K}')
