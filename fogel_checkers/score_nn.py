@@ -123,7 +123,7 @@ class ScoringNeuralNet():
             nodes[1].info_from.append(nodes[0])
 
     def score_board(self, adjusted_arr):
-        # board should be adjusted by player
+        # board should be adjusted
         # change values based on player num, made len 32
         if len(adjusted_arr) != 32:
             print('input arr must be len 32')

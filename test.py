@@ -1,7 +1,2 @@
-test = 2
-if test == 2:
-    print(2)
-elif test == -2:
-    print(-2)
-else:
-    print(11)
+test = [1,2,3,4,5,6,7,8,9,10]
+print([test[i] for i in range(len(test)) if i%2 == 1])

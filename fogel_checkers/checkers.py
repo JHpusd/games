@@ -38,8 +38,11 @@ class Checkers():
         return [coord1[0] - coord2[0], coord1[1] - coord2[1]]
     
     def get_all_moves(self, player, state=None):
+        player_num = player
+        if type(player) != int:
+            player_num = player.player_num
         
-        if state == None: state = self.state
+        if state == None: state = self.board
 
         possible_moves = []
 
@@ -53,7 +56,7 @@ class Checkers():
 
                 # check if there is a piece on the current coord
 
-                if abs(current_piece) == player.player_num:
+                if abs(current_piece) == player_num:
 
                     # get moves that the piece might be able to do
 
@@ -77,7 +80,7 @@ class Checkers():
                     
                         # check if the opponent is in the new spot
 
-                        elif abs(new_piece) == 3 - player.player_num:
+                        elif abs(new_piece) == 3 - player_num:
                             
                             # if so, and if the next next spot is empty, add that spot to moves_to_check
 
@@ -172,10 +175,6 @@ class Checkers():
 
         self.turn += 1
         if self.turn >= 100:
-            self.winner = 'Tie'
-        flat_board = self.flatten(self.board)
-        flat_board = [abs(item) for item in flat_board]
-        if flat_board.count(1)==1 and flat_board.count(2)==1:
             self.winner = 'Tie'
     
     def run_to_completion(self):
