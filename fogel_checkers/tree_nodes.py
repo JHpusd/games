@@ -98,6 +98,15 @@ class TreeNode():
         
         return possible_moves
     
+    def nested_list_in_list(self, parent_list, nested_list):
+        for l in parent_list:
+            if all(x == y for x, y in zip(l, nested_list)):
+                return True
+        return False
+    
+    def find_translation(self, coord1, coord2):
+        return [coord1[0] - coord2[0], coord1[1] - coord2[1]]
+    
     def check_for_winner(self):
         if len(self.get_all_moves(self.player, self.board)) == 0:
             return -1
@@ -124,10 +133,10 @@ class TreeNode():
         return arr
     
     def set_score(self):
-        if self.children == None or len(self.children) == 0:
-            if self.winner == self.player:
+        if len(self.children) == 0 or self.children == None:
+            if self.winner == 1:
                 self.score = 1
-            elif self.winner == 3 - self.player:
+            elif self.winner == -1:
                 self.score = -1
             elif self.winner == 'Tie':
                 self.score = 0
@@ -151,16 +160,17 @@ class TreeNode():
         elif self.turn == 3 - self.player:
             self.score = min(self.children_to_score())
 
-test_board = [
+'''test_board = [
     [0,0,0,0,0,0,0,0],
     [0,0,0,0,0,2,0,0],
     [0,0,0,0,0,0,0,0],
     [0,0,0,2,0,0,0,0],
     [0,0,0,0,0,0,0,0],
-    [0,0,0,1,0,0,0,0],
-    [0,0,1,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0],
 ]
 
-test = TreeNode(test_board,2,1,123)
-print(test.adjust_vals([1,1,1,-1,-1,-1,2,1,-2,2,2,2,-2]))
+test = TreeNode(test_board,2,2,123)
+test.set_score()
+print(test.score)'''
